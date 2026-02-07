@@ -28,8 +28,10 @@ RUN --mount=type=cache,target=/root/.cache/uv uv sync --locked --quiet
 COPY . .
 
 ENV PYTHONPATH=/app
-EXPOSE 8000
 
-# WORKERS and TIMEOUT are set via env variables at runtime (ECS task definition)
-# Defaults: WORKERS=4 (2 per vCPU), TIMEOUT=75 (worker heartbeat - async workers stay alive during active streams)
-CMD ["sh", "-c", "uv run gunicorn api:app -w ${WORKERS:-4} -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --timeout ${TIMEOUT:-75} --graceful-timeout 30 --keep-alive 65"]
+# ⚠️ تغيير البورت لـ 7860 (ده قانون في Hugging Face)
+EXPOSE 7860
+
+# WORKERS and TIMEOUT settings
+# لاحظ تغيير --bind 0.0.0.0:7860 في السطر الأخير
+CMD ["sh", "-c", "uv run gunicorn api:app -w ${WORKERS:-4} -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:7860 --timeout ${TIMEOUT:-75} --graceful-timeout 30 --keep-alive 65"]
